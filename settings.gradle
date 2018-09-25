@@ -1,0 +1,3 @@
+rootProject.name = 'skript'
+include 'skript-core'
+include 'skript-parser'
