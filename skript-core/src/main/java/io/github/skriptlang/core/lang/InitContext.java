@@ -2,6 +2,8 @@ package io.github.skriptlang.core.lang;
 
 import java.util.List;
 
+import io.github.skriptlang.core.log.ErrorType;
+import io.github.skriptlang.core.log.InitErrorException;
 import io.github.skriptlang.core.log.SourceLine;
 
 /**
@@ -42,6 +44,11 @@ public class InitContext {
     private final Trigger trigger;
     
     public InitContext(List<Expression<?>> allExprs, int startSlot, SourceLine line, Trigger trigger) {
+        assert allExprs != null;
+        assert startSlot >= 0 && startSlot < allExprs.size();
+        assert line != null;
+        assert trigger != null;
+        
         this.allExprs = allExprs;
         this.startSlot = startSlot;
         // If asserts are enabled, make an array for tracking already used slots
@@ -60,6 +67,7 @@ public class InitContext {
      */
     @SuppressWarnings("unchecked")
     public <T> Expression<T> peek(Class<T> type, int slot) {
+        assert type != null : "null type";
         int index = startSlot + slot;
         assert index >= startSlot && index < allExprs.size() : "slot out of bounds";
         
@@ -95,7 +103,11 @@ public class InitContext {
         return trigger;
     }
     
-    public void error() {
-        
+    public void error(String msg, ErrorType type) {
+        throw new InitErrorException(msg, line, trigger, type);
+    }
+    
+    public void warning(String msg) {
+        // TODO implement warnings
     }
 }
