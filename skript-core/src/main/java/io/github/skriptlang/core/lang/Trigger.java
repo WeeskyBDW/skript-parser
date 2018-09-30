@@ -45,11 +45,10 @@ public class Trigger {
         assert this.items == null : "items already set";
         this.items = items;
     }
-    
-    public void run(TriggerContext ctx) {
-        assert items != null;
-        for (int i = 0; i < items.length;) {
-            i += items[i].walk(ctx);
-        }
+
+    public TriggerItem[] getItems() {
+        assert items != null : "items not yet set";
+        return items;
     }
+    
 }
