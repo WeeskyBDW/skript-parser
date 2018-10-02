@@ -61,16 +61,5 @@ public interface Expression<T> extends SyntaxElement {
         assert type != null : "return type annotation missing and method not overridden";
         return (Class<T>) type.value(); // TODO generics?
     }
-    
-    /**
-     * Checks whether this expression is a literal.
-     * @return Whether this expression is a literal.
-     */
-    default boolean isLiteral() {
-        Literal literal = getClass().getDeclaredAnnotation(Literal.class);
-        if (literal == null) {
-            return false;
-        }
-        return literal.value();
-    }
+
 }

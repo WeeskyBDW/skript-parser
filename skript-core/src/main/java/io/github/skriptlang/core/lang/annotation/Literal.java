@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Literal {
 
-    boolean value() default false;
+    boolean value() default true;
 }
