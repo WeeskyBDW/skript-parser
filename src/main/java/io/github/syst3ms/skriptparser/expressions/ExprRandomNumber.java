@@ -19,7 +19,7 @@ public class ExprRandomNumber implements Expression<Number> {
 
     private Expression<Number> lowerNumber, maxNumber;
     private boolean isInteger;
-    private boolean isStictly;
+    private boolean isStrictly;
     private final ThreadLocalRandom thread = ThreadLocalRandom.current();
 
     static {
@@ -38,7 +38,7 @@ public class ExprRandomNumber implements Expression<Number> {
         lowerNumber = (Expression<Number>) expressions[0];
         maxNumber = (Expression<Number>) expressions[1];
         isInteger = matchedPattern == 0;
-        isStictly = context.getParseMark() == 1;
+        isStrictly = context.getParseMark() == 1;
         return true;
     }
 
@@ -49,27 +49,25 @@ public class ExprRandomNumber implements Expression<Number> {
         if (low == null || max == null) {
             return new Number[0];
         }
-        int lowInt = low.intValue();
-        int maxInt = max.intValue();
-        if (lowInt > maxInt) {
-            int oldMax = maxInt;
-            maxInt = lowInt;
-            lowInt = oldMax;
+        long lowLong = low.longValue();
+        long maxLong = max.intValue();
+        if (lowLong > maxLong) {
+            long oldMax = maxLong;
+            maxLong = lowLong;
+            lowLong = oldMax;
         }
-        if (isStictly) {
-            lowInt--;
-            maxInt++;
+        if (isStrictly) {
+            lowLong++;
+            maxLong--;
         }
-        System.out.println("low" + lowInt);
-        System.out.println("max" + maxInt);
         if (isInteger) {
-            return new Long[]{thread.nextLong((long) lowInt, (long) maxInt)};
+            return new Long[]{thread.nextLong(lowLong, maxLong)};
         }
-		return new Double[]{thread.nextDouble((double) lowInt, (double) maxInt)};
+		return new Double[]{thread.nextDouble(lowLong, maxLong)};
     }
 
     @Override
     public String toString(@Nullable TriggerContext ctx, boolean debug) {
-        return "a random " + (isInteger ? "integer" : "number") + " between " + lowerNumber.toString(ctx, debug) + " and " + maxNumber.toString(ctx, debug) + "strictly";
+        return "a " + (isStrictly ? "strictly" : "") + "random " + (isInteger ? "integer" : "number") + " between " + lowerNumber.toString(ctx, debug) + " and " + maxNumber.toString(ctx, debug);
     }
 }
