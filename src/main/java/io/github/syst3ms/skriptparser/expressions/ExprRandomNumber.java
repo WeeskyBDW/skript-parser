@@ -3,7 +3,9 @@ package io.github.syst3ms.skriptparser.expressions;
 import io.github.syst3ms.skriptparser.Main;
 import io.github.syst3ms.skriptparser.lang.Expression;
 import io.github.syst3ms.skriptparser.lang.TriggerContext;
+import io.github.syst3ms.skriptparser.log.SkriptLogger;
 import io.github.syst3ms.skriptparser.parsing.ParseContext;
+import io.github.syst3ms.skriptparser.util.math.NumberMath;
 import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.ThreadLocalRandom;
 import java.lang.Math;
@@ -18,10 +20,10 @@ import java.lang.Math;
 public class ExprRandomNumber implements Expression<Number> {
 
     private Expression<Number> lowerNumber, maxNumber;
+    private final ThreadLocalRandom random = ThreadLocalRandom.current();
+    private final SkriptLogger log = new SkriptLogger();
     private boolean isInteger;
     private boolean isStrictly;
-    private final ThreadLocalRandom thread = ThreadLocalRandom.current();
-
     static {
         Main.getMainRegistration().addExpression(
                 ExprRandomNumber.class,
@@ -46,24 +48,18 @@ public class ExprRandomNumber implements Expression<Number> {
     public Number[] getValues(TriggerContext ctx) {
         Number low = lowerNumber.getSingle(ctx);
         Number max = maxNumber.getSingle(ctx);
-        if (low == null || max == null) {
+        if (low == null || max == null)
             return new Number[0];
-        }
-        long lowLong = low.longValue();
-        long maxLong = max.intValue();
-        if (lowLong > maxLong) {
-            long oldMax = maxLong;
-            maxLong = lowLong;
-            lowLong = oldMax;
-        }
-        if (isStrictly) {
-            lowLong++;
-            maxLong--;
-        }
-        if (isInteger) {
-            return new Long[]{thread.nextLong(lowLong, maxLong)};
-        }
-		return new Double[]{thread.nextDouble(lowLong, maxLong)};
+
+        //Send an error if low == max
+        /*if(low.doubleValue() == max.doubleValue())
+            return log.error("Cannot ");*/
+
+        //Check to find out which number is the greater of the 2, while keeping the type
+        Number realLow = low.doubleValue() >= max.doubleValue() ? low : max;
+        Number realMax = low.doubleValue() <= max.doubleValue() ? max : low;
+
+        return new Number[]{NumberMath.random(low, max, isStrictly, random)};
     }
 
     @Override
