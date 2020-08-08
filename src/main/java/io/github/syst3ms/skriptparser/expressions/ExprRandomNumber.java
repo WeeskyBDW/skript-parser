@@ -55,11 +55,6 @@ public class ExprRandomNumber implements Expression<Number> {
         Number realLow = low.doubleValue() < max.doubleValue() ? low : max;
         Number realMax = low.doubleValue() < max.doubleValue() ? max : low;
 
-        //Number realMax = numComp.apply(low, max).is(Relation.SMALLER_OR_EQUAL) ? max : low;
-
-        //debug
-        /*System.out.println(realLow);
-        System.out.println(realMax);*/
         return new Number[]{NumberMath.random(realLow, realMax, !isExclusive, random)};
     }
 
