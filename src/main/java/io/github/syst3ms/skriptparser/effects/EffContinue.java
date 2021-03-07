@@ -6,7 +6,6 @@ import io.github.syst3ms.skriptparser.log.ErrorType;
 import io.github.syst3ms.skriptparser.parsing.ParseContext;
 import io.github.syst3ms.skriptparser.sections.SecLoop;
 import io.github.syst3ms.skriptparser.sections.SecWhile;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,6 @@ import java.util.Optional;
  * @author Mwexim
  */
 public class EffContinue extends Effect {
-
     static {
         Parser.getMainRegistration().addEffect(
             EffContinue.class,
@@ -42,7 +40,7 @@ public class EffContinue extends Effect {
             }
         }
         if (loops.size() == 0) {
-            parseContext.getLogger().error("You can only use the 'continue' in a loop!", ErrorType.SEMANTIC_ERROR);
+            parseContext.getLogger().error("You can only use 'continue' in a loop!", ErrorType.SEMANTIC_ERROR);
             return false;
         }
         // Closest loop will be the first item
@@ -64,7 +62,7 @@ public class EffContinue extends Effect {
     }
 
     @Override
-    public String toString(@Nullable TriggerContext ctx, boolean debug) {
+    public String toString(TriggerContext ctx, boolean debug) {
         return "continue";
     }
 }

@@ -5,7 +5,6 @@ import io.github.syst3ms.skriptparser.lang.Expression;
 import io.github.syst3ms.skriptparser.lang.SkriptEvent;
 import io.github.syst3ms.skriptparser.lang.TriggerContext;
 import io.github.syst3ms.skriptparser.parsing.ParseContext;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The script loading event.
@@ -18,11 +17,10 @@ import org.jetbrains.annotations.Nullable;
  * @author Syst3ms
  */
 public class EvtScriptLoad extends SkriptEvent {
-
     static {
         Parser.getMainRegistration()
                 .newEvent(EvtScriptLoad.class, "script load[ing]")
-                .addContextValue(ScriptLoadContext.class, String.class, "arguments", ScriptLoadContext::getArguments)
+                .addContextValue(ScriptLoadContext.class, String.class, false, "arguments", ScriptLoadContext::getArguments)
                 .setHandledContexts(ScriptLoadContext.class)
                 .register();
     }
@@ -38,7 +36,7 @@ public class EvtScriptLoad extends SkriptEvent {
     }
 
     @Override
-    public String toString(@Nullable TriggerContext ctx, boolean debug) {
+    public String toString(TriggerContext ctx, boolean debug) {
         return "script loading";
     }
 }

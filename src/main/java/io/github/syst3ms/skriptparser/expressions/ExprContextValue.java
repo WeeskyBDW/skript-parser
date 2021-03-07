@@ -7,7 +7,6 @@ import io.github.syst3ms.skriptparser.parsing.ParseContext;
 import io.github.syst3ms.skriptparser.registration.contextvalues.ContextValue;
 import io.github.syst3ms.skriptparser.registration.contextvalues.ContextValueState;
 import io.github.syst3ms.skriptparser.registration.contextvalues.ContextValues;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A specific context value.
@@ -19,13 +18,12 @@ import org.jetbrains.annotations.Nullable;
  * @author Mwexim
  */
 public class ExprContextValue implements Expression<Object> {
-
 	static {
 		Parser.getMainRegistration().addExpression(
 				ExprContextValue.class,
 				Object.class,
 				false,
-				"[the] [1:(past|previous)|2:(future|next)] context-<.+>"
+				"[the] [(1:(past|previous)|2:(future|next))] context-<.+>"
 		);
 	}
 
@@ -50,7 +48,12 @@ public class ExprContextValue implements Expression<Object> {
 
 	@Override
 	public Class<?> getReturnType() {
-		return value.getType();
+		return value.getType().getTypeClass();
+	}
+
+	@Override
+	public boolean isSingle() {
+		return value.isSingle();
 	}
 
 	@Override
@@ -59,7 +62,7 @@ public class ExprContextValue implements Expression<Object> {
 	}
 
 	@Override
-	public String toString(final @Nullable TriggerContext ctx, final boolean debug) {
+	public String toString(final TriggerContext ctx, final boolean debug) {
 		String state = "";
 		if (time == ContextValueState.PAST) {
 			state = "past ";
@@ -68,5 +71,4 @@ public class ExprContextValue implements Expression<Object> {
 		}
 		return state + "context-" + name;
 	}
-
 }

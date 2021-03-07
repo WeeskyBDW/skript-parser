@@ -6,7 +6,6 @@ import io.github.syst3ms.skriptparser.lang.TriggerContext;
 import io.github.syst3ms.skriptparser.lang.properties.PropertyExpression;
 import io.github.syst3ms.skriptparser.parsing.ParseContext;
 import io.github.syst3ms.skriptparser.util.color.Color;
-import org.jetbrains.annotations.Nullable;
 
 import java.math.BigInteger;
 
@@ -27,11 +26,11 @@ public class ExprColorValues extends PropertyExpression<BigInteger, Color> {
 				BigInteger.class,
 				false,
 				"color",
-				"(0:rgb [(value|color)]|1:red value|2:green value|3:blue value)"
+				"(rgb[4:a] [value[s]]|1:red value|2:green value|3:blue value)"
 		);
 	}
 
-	int parseMark;
+	private int parseMark;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -57,6 +56,13 @@ public class ExprColorValues extends PropertyExpression<BigInteger, Color> {
 				return new BigInteger[] {BigInteger.valueOf(c.getGreen())};
 			case 3:
 				return new BigInteger[] {BigInteger.valueOf(c.getBlue())};
+			case 4:
+				return new BigInteger[] {
+						BigInteger.valueOf(c.getRed()),
+						BigInteger.valueOf(c.getGreen()),
+						BigInteger.valueOf(c.getBlue()),
+						BigInteger.valueOf(c.getAlpha())
+				};
 			default:
 				throw new IllegalStateException();
 		}
@@ -64,11 +70,11 @@ public class ExprColorValues extends PropertyExpression<BigInteger, Color> {
 
 	@Override
 	public boolean isSingle() {
-		return parseMark != 0;
+		return parseMark != 0 && parseMark != 4;
 	}
 
 	@Override
-	public String toString(@Nullable TriggerContext ctx, boolean debug) {
+	public String toString(TriggerContext ctx, boolean debug) {
 		switch (parseMark) {
 			case 0:
 				return "rgb value of " + getOwner().toString(ctx, debug);
@@ -78,6 +84,8 @@ public class ExprColorValues extends PropertyExpression<BigInteger, Color> {
 				return "green value of " + getOwner().toString(ctx, debug);
 			case 3:
 				return "blue value of " + getOwner().toString(ctx, debug);
+			case 4:
+				return "rgba value of " + getOwner().toString(ctx, debug);
 			default:
 				throw new IllegalStateException();
 		}
