@@ -4,8 +4,10 @@ import io.github.syst3ms.skriptparser.Parser;
 import io.github.syst3ms.skriptparser.lang.Expression;
 import io.github.syst3ms.skriptparser.lang.TriggerContext;
 import io.github.syst3ms.skriptparser.parsing.ParseContext;
+import io.github.syst3ms.skriptparser.util.DoubleOptional;
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 /**
  * Change String or number into another base
@@ -36,43 +38,89 @@ public class ExprChangeBase implements Expression<Object> {
                 Object.class,
                 true,
 
+                "%integer/string% convert in [0:hexadecimal|1:octal|2:binary|3:base64|4:decimal]",
+
+                /*
                 //Number to string
-                "%number% convert[ed] in hexadecimal",
-                "%number% convert[ed] in octal",
-                "%number% convert[ed] in binary",
-                "%number% convert[ed] in base64",
+                "%number% convert in hexadecimal",
+                "%number% convert in octal",
+                "%number% convert in binary",
+                "%number% convert in base64",
 
                 //String to string
-                "%string% convert[ed] in hexadecimal",
-                "%string% convert[ed] in binary",
-                "%string% convert[ed] in octal",
-                "%string% convert[ed] in base64",
+                "%string% convert in hexadecimal",
+                "%string% convert in binary",
+                "%string% convert in octal",
+                "%string% convert in base64",
 
-                //String to number
-                "%string% convert[ed] in decimal",
+                 //String to number
+                "%string% convert in decimal",
+                */
+
 
                 //Base N to base c
-                "%number% convert[ed] in base %number%"
+                "%string% convert in base %integer%"
         );
     }
     @Override
     public boolean init(Expression<?>[] expressions, int matchedPattern, ParseContext parseContext) {
         expression = expressions[0];
-        if (matchedPattern == 9) customBase = (Expression<Number>) expressions[1];
-        conversion = matchedPattern;
+        customBase = (Expression<Number>) expressions[1];
+        conversion = parseContext.getParseMark();
         return true;
     }
+
+    private Object convertBase(String str, Integer base, boolean returnNumber) {
+        if (returnNumber)
+            return Integer.parseInt(str, base);
+        else return Integer.toString(Integer.parseInt(str), base);
+    }
+
+    private void convertBase(Number nbr, Integer base, boolean returnNumber) {
+        convertBase(nbr.toString(), base, returnNumber);
+    }
+
     // TODO: continue implementation and test already implements things
     @Override
     public Object[] getValues(TriggerContext ctx) {
-        var value = expression.getSingle(ctx).get();
-        Number base = customBase.getSingle(ctx).isPresent() ? customBase.getSingle(ctx).get() : 10;
+        return DoubleOptional.ofOptional(expression.getSingle(ctx), customBase.getSingle(ctx))
+                .flatMap((n, b) -> DoubleOptional.of(
+                        n instanceof BigInteger ? n.toString() : (String) n,
+                        b instanceof BigInteger ? b.intValue() : 10
+                ))
+                //TODO finir gestion première syntaxe
+                .flatMapToOptional((n,b) -> {
+                    Object result = -1;
+                    if (customBase.getSingle(ctx).isPresent())
+                        result = convertBase(n, b, false);
+                    else {
+                        switch (conversion) {
+                            case 0:
+                                result = convertBase(n, 16, false);
+                            case 1:
+                                result = convertBase(n, 8, true);
+                        }
+                    }
+                    return new Object[] {result};
+                });
+        //return new Object[]{};
+        }
+
+    ;
+        /*
+        Optional<Object> value = expression.getSingle(ctx)
+                .filter(v -> v instanceof String)
+                    .map(v -> (Number) Integer.parseInt(v))
+                .orElse()
+        Optional<Object> base = Optional.of(customBase.getSingle(ctx)
+                .map(v -> (Number) v)
+                .orElse(10));
         Object returnValue = new Object();
         //Set the good type for theses syntax
         if (value instanceof Number) {
             switch (conversion) {
                 case 0:
-                    returnValue = Integer.toString(((Number) value).intValue(), 16);
+                    returnValue = Integer.toHexString()
                 case 1:
                     returnValue = Integer.toString(((Number) value).intValue(), 8);
                 case 2:
@@ -84,11 +132,13 @@ public class ExprChangeBase implements Expression<Object> {
             }
         } else if (value instanceof String) {
             switch (conversion) {
-                // TODO: implement
+                case 4:
+                    returnValue = Integer.toHexString()
             }
         }
-
         return new Object[] {returnValue};
+        */
+
     }
 
     @Override
