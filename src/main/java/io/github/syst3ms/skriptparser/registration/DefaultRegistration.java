@@ -21,6 +21,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.IntStream;
 
 /**
@@ -251,6 +253,17 @@ public class DefaultRegistration {
                         return Duration.class;
                     }
                 })
+                .register();
+
+        registration.newType(Pattern.class, "regex", "regex@s")
+                .literalParser(r -> {
+
+                    try {
+                        return Pattern.compile(r);
+                    } catch (PatternSyntaxException e) {
+                        return null;
+                    }
+                }).toStringFunction(Pattern::toString)
                 .register();
 
         /*
